@@ -110,6 +110,12 @@ def main(inhandles, outfile, anonnets, offset, secret):
                 frame.src = b'\x00' * len(frame.src)
                 frame.dst = b'\x00' * len(frame.dst)
                 packettype = frame.type
+
+                # Handle VLANs - TODO: QinQ
+                if frame.type == dpkt.ethernet.ETH_TYPE_8021Q:
+                    # dptk already extracts the VLAN ID in .tag and the next ethernet type in .type
+                    packettype = frame.vlan_tags[0].type
+
             elif linktype == dpkt.pcap.DLT_LINUX_SLL: # Linux cooked capture (SLL)
                 frame = dpkt.sll.SLL(data)
                 # clear MAC address
